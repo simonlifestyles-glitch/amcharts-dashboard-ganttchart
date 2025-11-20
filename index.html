@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gantt Chart Demo</title>
+
+  <!-- amCharts Libraries -->
+  <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #f5f7fb;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    #chartdiv {
+      width: 100%;
+      height: 600px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+      margin: 24px auto;
+      max-width: 1200px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="chartdiv"></div>
+
+  <script>
+    am5.ready(function () {
+      var root = am5.Root.new("chartdiv");
+
+      root.setThemes([
+        am5themes_Animated.new(root)
+      ]);
+
+      // Chart
+      var chart = root.container.children.push(am5xy.XYChart.new(root, {
+        panX: true,
+        panY: false,
+        wheelX: "panX",
+        wheelY: "zoomX",
+        layout: root.verticalLayout
+      }));
+
+      // Y Axis (Projects / Tasks)
+      var yRenderer = am5xy.AxisRendererY.new(root, {});
+      yRenderer.grid.template.set("visible", false);
+
+      var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root, {
+        categoryField: "category",
+        renderer: yRenderer
+      }));
+
+      // X Axis (Timeline)
+      var xRenderer = am5xy.AxisRendererX.new(root, {});
+      var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+        baseInterval: { timeUnit: "day", count: 1 },
+        renderer: xRenderer
+      }));
+
+      // Series (Gantt bars)
+      var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+        name: "Timeline",
+        xAxis: xAxis,
+        yAxis: yAxis,
+        openValueXField: "start",
+        valueXField: "end",
+        categoryYField: "category",
+        sequencedInterpolation: true
+      }));
+
+      series.columns.template.setAll({
+        height: 30,
+        cornerRadiusTL: 8,
+        cornerRadiusTR: 8
+      });
+
+      // Data
+      var data = [
+        {
+          category: "專案規劃",
+          start: new Date(2025, 0, 1).getTime(),
+          end: new Date(2025, 0, 10).getTime()
+        },
+        {
+          category: "資料蒐集",
+          start: new Date(2025, 0, 5).getTime(),
+          end: new Date(2025, 0, 20).getTime()
+        },
+        {
+          category: "甘特圖開發",
+          start: new Date(2025, 0, 12).getTime(),
+          end: new Date(2025, 0, 28).getTime()
+        },
+        {
+          category: "Notion 整合",
+          start: new Date(2025, 0, 20).getTime(),
+          end: new Date(2025, 1, 2).getTime()
+        }
+      ];
+
+      yAxis.data.setAll(data);
+      series.data.setAll(data);
+
+      // Animation
+      series.appear(1000);
+      chart.appear(1000, 100);
+    });
+  </script>
+</body>
+</html>
